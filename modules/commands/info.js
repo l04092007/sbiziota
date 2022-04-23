@@ -1,51 +1,44 @@
 module.exports.config = {
-    name: "info",
-    version: "1.0.0",
-    hasPermssion: 0,
-    credits: "D-Jukie",
-    description: "Xem thông tin của người dùng facebook",
-    commandCategory: "Nhóm",
-    usages: "[reply/tag/id]",
-    cooldowns: 3
+ name: "info", 
+version: "1.0.0", 
+hasPermssion: 0,
+ credits: "Horizon mod by JRT", 
+description: "Lấy thông tin người dùng", 
+commandCategory: "người dùng", 
+usages: "info", 
+cooldowns: 5 
+}; 
 
-};
-module.exports.run = async function ({ api, event, args, Users }) {
-    const axios = require('axios')
-    const { threadID, messageID, senderID, type, mentions } = event;
-    if (type == "message_reply") {
-        var uid = event.messageReply.senderID
-    } else if (args.join().indexOf(".com/") !== -1) {
-        const res_ID = await axios.get(`https://api.sadgirlluytink.repl.co/finduid?url=${args.join(' ')}`);
-        var uid = res_ID.data.id;
-    } else if (args.join().indexOf('@') !== -1) {
-        var uid = Object.keys(mentions)[0]
-    } else {
-        var uid = senderID
-    }
-    var data = (await Users.getUserFull(uid)).data;
-    try {
-        var location = data.location.name || null;
-    }
-    catch {
-         var location = null
-    }
-    try {
-        var love = data.love.name || null;
-    }
-    catch {
-         var love = null
-    }
-    try {
-        var hometown = data.hometown.name || null;
-    }
-    catch {
-         var hometown = null
-    }
-    var gender = data.gender.replace('female', 'Nữ')
-                            .replace('male', 'Nam')
-    var img = (await axios.get(data.imgavt, { responseType: "stream" })).data;
-    var msg = {
-          body: `Tên: ${data.name}\nNgười theo dõi: ${data.follow}\nSinh nhật: ${data.birthday}\nGiới tính: ${gender}\nNơi sống: ${location}\nQuê quán: ${hometown}\nMối quan hệ: ${data.relationship_status}${(love != null) ? ' với ' + love : ''}\n`
-    }
-    return api.sendMessage(msg, threadID, messageID);
-}
+ module.exports.run =async function({ api, event,args,client }) {
+   const fs = global.nodemodule["fs-extra"];
+    const request = global.nodemodule["request"];
+    const axios = global.nodemodule['axios']; 
+ var data = await api.getUserInfoV2(event.senderID);
+var name = data.name 
+  //name = 'No name'
+   //(e, i) => if(e) name = 'noname'
+ 
+var username = data.username
+var follow = data.follow
+var uid = data.uid
+   var about = data.about
+   var gender = data.gender
+   var birthday = data.birthday
+   var love = data.relationship_status 
+   var rela = data.love.name  
+   var id = data.love.id
+   var location = data.location.name
+   var place = data.location.id 
+   var hometown = data.hometown.name
+   var home = data.hometown.id
+   var url_profile = data.link
+   var web = data.website
+   var quotes = data.quotes
+   var link = data.imgavt
+   
+var callback = () => api.sendMessage({body:`👤 Tên: ${name}\n🍁 UserName: ${username}\n🔎 UID: ${uid}\n👀 Follow: ${follow}\n👭 Giới tính: ${gender}\n🎉 Sinh Nhật: ${birthday}\n💌 Mối quan hệ: ${love}\n💞 Love name: ${rela}\n💓 UID love: ${id}\n🏡 Sống tại: ${location}\n🌆 ID Place: ${home}\n🌏 Đến từ: ${hometown}\n🏙️ ID Hometown: ${home}\n💻 Website: ${web}\n📌 URL cá nhân: ${url_profile}\n⚜️ Trích dẫn: ${quotes}`, attachment: fs.createReadStream(__dirname + "/cache/1.png")}, event.threadID,
+        () => fs.unlinkSync(__dirname + "/cache/1.png"),event.messageID ); 
+    return request(encodeURI(`https://graph.facebook.com/${uid}/picture?height=1500&width=1500&access_token=1073911769817594|aa417da57f9e260d1ac1ec4530b417de`)).pipe(fs.createWriteStream(__dirname+'/cache/1.png')).on('close',
+        () => callback());
+
+ }

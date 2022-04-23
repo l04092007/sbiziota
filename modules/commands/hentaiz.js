@@ -4,8 +4,8 @@ module.exports.config = {
     hasPermssion: 0,
     credits: "D-Jukie",
     description: "Đọc truyện hentaizz",
-    commandCategory: "Giải trí",
-    usages: "",
+    commandCategory: "nsfw",
+    usages: "hentaiz",
     cooldowns: 5
 };
 module.exports.getHentaiz = async function(type, first, second) {

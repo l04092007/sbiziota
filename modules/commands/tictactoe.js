@@ -2,9 +2,9 @@ module.exports.config = {
 	name: "ttt",
 	version: "1.0.1",
 	hasPermssion: 0,
-	credits: "Mirai Team",
+	credits: "Meew",
 	description: "Play tictactoe with AI",
-	commandCategory: "Giải trí",
+	commandCategory: "Game",
 	cooldowns: 5,
 	usages: "[random/x/o]"
 };

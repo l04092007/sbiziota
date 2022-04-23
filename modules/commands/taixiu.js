@@ -34,28 +34,7 @@ module.exports.languages = {
         "error": "⚠ ERROR MODULE TAIXIU %1"
     },
     "en": {
-        "moneyEror": "⚠ The bet amount is not a valid number!",
-        "moneyMin": "⚠ Bet amount must be greater than or equal to 50$!!",
-        "moneyDeCreate": "⚠ You don't have enough %1 $ to create a new game table!!",
-        "gameCreated": "⚠ This group has been opened to the game table!",
-        "createSuccess": "🥳 Successfully created a gaming table!\n=> Bet amount: %1$\n=> Number of members participating: 1 member\n=> If you want to start the game, please write %2 start\n=> If you want to end the game, please write %3 end\n=> Join this game group please write %4 join",
-        "notCreatedYet": "⚠ This group currently does not have any tables!\n=> Please create a new game table to join!",
-        "gameStarted": "⚠ This game table has already started!",
-        "moneyDeJoin": "⚠ You don't have enough %1$ to join this game table!",
-        "joined": "⚠You have now joined this game table!",
-        "joinSuccess": "🥳 You have joined the game table!\n=> Current membership is %1 member",
-        "userNotInGame": "⚠ You were not in the game table to leave!",
-        "leaveFail": "⚠ The game table has been started and can't be left!",
-        "leaveSuccess": "🥺 You have left the group game table!",
-        "countPlayer": "🥺 %1 has left the game table!\n=> The game table is still available %2 member",
-        "authorLeave": "🥺 %1 has left the game table, the group's game table has been disbanded!",
-        "startFail": "⚠ You are not the creator of this game board, so you cannot start the game",
-        "notEnoughMembers": "⚠ Your game board doesn't have enough members to start!",
-        "startPlaying": "🔊 GAME START: \n-> Please %1 Players text 'tài' or 'xỉu' (Note: the message is in this group!!!)",
-        "endFail": "⚠ You are not the creator of the game board, so you cannot delete the game table",
-        "endSuccess": "🎆 Removed the game board!",
-        "tutorial": "⚠ BODY:\n- create/new/-c: Create a poker table\n- join/-j: Join the poker table\n- leave/-l: Get off the table\n- start/-s: Let's start the table of fainting\n- end/-e: The end of the table of fainting",
-        "error": "⚠ ERROR MODULE TAIXIU %1"
+        "update": "..."
     }
 }
 module.exports.handleEvent = async function({ api, event, Currencies }) {
@@ -64,12 +43,10 @@ module.exports.handleEvent = async function({ api, event, Currencies }) {
   const random = typ[Math.floor(Math.random() * typ.length)];  
   if (!body) return;
   if (body.toLowerCase() == 'tài' || body.toLowerCase() == 'xỉu') {
-    if(!global.taixiuS) return
     const gameThread = global.taixiuS.get(threadID) || {};
     if (!gameThread) return;
     if(gameThread.start != true) return;
     else {
-      var playerGame = gameThread.player.length
       if (!gameThread.player.find(i => i.userID == senderID)) return;
       else {
         var s, q;
@@ -123,13 +100,11 @@ module.exports.handleEvent = async function({ api, event, Currencies }) {
                   var msg = '💎 KẾT QUẢ: ' + ketqua.toUpperCase() + '\n\n🥳 Những người chiến thắng:\n';
                   var dem_win = 0;
                   var dem_lose = 0;
-                  var winCount = 0;
                   for (var w of win) {
                     var data_money = (await Currencies.getData(w.userID));
-                    data_money.money = data_money.money + ((gameThread.money * parseInt(playerGame))/parseInt(winCount)).toFixed(0);
+                    data_money.money = data_money.money + parseInt(gameThread.money * 3);
                     await Currencies.setData(w.userID, { data: data_money });
                     dem_win++;
-                    winCount = winCount + 1
                     msg += dem_win + '. ' + w.name + '\n';
                   }
                   for (var l of lose) {
@@ -142,7 +117,7 @@ module.exports.handleEvent = async function({ api, event, Currencies }) {
                     dem_lose++;
                     msg += dem_lose + '. ' + l.name + '\n';
                   }
-                  msg += '\n🎁 Những người thắng nhận được [ ' + ((gameThread.money * parseInt(playerGame))/parseInt(winCount)).toFixed(0) + '$ ]\n';
+                  msg += '\n🎁 Những người thắng nhận được [ ' + (gameThread.money * 3) + '$ ]\n';
                   msg += '💰 Những người thua bị trừ [' + gameThread.money + '$ ]';
                   global.taixiuS.delete(threadID);
                   return api.sendMessage(msg, threadID);
